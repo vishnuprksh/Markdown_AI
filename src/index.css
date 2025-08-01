@@ -1,84 +1,162 @@
+* {
+  box-sizing: border-box;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', 
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  color: #1e293b;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: 'JetBrains Mono', 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 .markdown-editor {
   display: flex;
   height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 8px;
+  gap: 8px;
 }
 
 .editor-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .preview-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .panel-header {
-  background-color: #f5f5f5;
-  padding: 10px 15px;
-  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
   font-weight: 600;
-  color: #333;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .editor-textarea {
   flex: 1;
   border: none;
-  padding: 15px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  padding: 20px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
   resize: none;
   outline: none;
-  background-color: #fafafa;
+  background-color: #fafbfc;
+  color: #1e293b;
+  transition: background-color 0.2s ease;
+}
+
+.editor-textarea:focus {
+  background-color: #ffffff;
+}
+
+.editor-textarea::placeholder {
+  color: #64748b;
+  font-style: italic;
 }
 
 .preview-content {
   flex: 1;
-  padding: 15px;
+  padding: 20px;
   overflow-y: auto;
-  background-color: white;
+  background-color: #ffffff;
+  line-height: 1.7;
+}
+
+.preview-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preview-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.preview-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.preview-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .toolbar {
-  background-color: #f8f9fa;
-  padding: 8px 15px;
-  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  padding: 12px 20px;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .toolbar-button {
-  padding: 6px 12px;
-  border: 1px solid #ddd;
-  background-color: white;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
-  transition: background-color 0.2s;
+  font-weight: 500;
+  color: #475569;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toolbar-button:hover {
-  background-color: #e9ecef;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  border-color: transparent;
+}
+
+.toolbar-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
 }
 
 .file-input {
@@ -86,17 +164,28 @@ code {
 }
 
 .toolbar-hint {
-  font-size: 12px;
-  color: #666;
-  padding: 6px 8px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+  font-size: 11px;
+  color: #64748b;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 8px;
   cursor: help;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar-hint:hover {
-  background-color: #e9ecef;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(to bottom, transparent, #e2e8f0, transparent);
+  margin: 0 4px;
 }
 
 /* Markdown preview styles */
@@ -106,89 +195,230 @@ code {
 .preview-content h4,
 .preview-content h5,
 .preview-content h6 {
-  margin-top: 24px;
+  margin-top: 32px;
   margin-bottom: 16px;
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1e293b;
 }
 
 .preview-content h1 {
-  font-size: 2em;
-  border-bottom: 1px solid #eaecef;
-  padding-bottom: 10px;
+  font-size: 2.25em;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .preview-content h2 {
+  font-size: 1.75em;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 10px;
+  color: #334155;
+}
+
+.preview-content h3 {
   font-size: 1.5em;
-  border-bottom: 1px solid #eaecef;
-  padding-bottom: 8px;
+  color: #475569;
+}
+
+.preview-content h4 {
+  font-size: 1.25em;
+  color: #64748b;
 }
 
 .preview-content p {
   margin-bottom: 16px;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: #374151;
 }
 
 .preview-content pre {
-  background-color: #f6f8fa;
-  border-radius: 6px;
-  padding: 16px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
   overflow: auto;
-  font-size: 85%;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #475569;
 }
 
 .preview-content code {
-  background-color: rgba(175, 184, 193, 0.2);
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-size: 85%;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #7c3aed;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
 }
 
 .preview-content pre code {
-  background-color: transparent;
+  background: transparent;
+  color: inherit;
   padding: 0;
+  border: none;
 }
 
 .preview-content blockquote {
-  padding: 0 16px;
-  color: #6a737d;
-  border-left: 4px solid #dfe2e5;
-  margin: 0 0 16px 0;
+  padding: 16px 20px;
+  color: #64748b;
+  border-left: 4px solid #667eea;
+  margin: 16px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
 }
 
 .preview-content table {
   border-collapse: collapse;
-  margin: 16px 0;
+  margin: 20px 0;
   width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .preview-content table th,
 .preview-content table td {
-  border: 1px solid #dfe2e5;
-  padding: 6px 13px;
+  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  text-align: left;
 }
 
 .preview-content table th {
-  background-color: #f6f8fa;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.preview-content table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.preview-content table tr:hover {
+  background-color: #f1f5f9;
 }
 
 .preview-content img {
   max-width: 100%;
   height: auto;
-  border-radius: 4px;
-  margin: 8px 0;
+  border-radius: 8px;
+  margin: 16px 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.preview-content img:hover {
+  transform: scale(1.02);
 }
 
 .preview-content ul,
 .preview-content ol {
-  padding-left: 30px;
+  padding-left: 24px;
   margin-bottom: 16px;
 }
 
 .preview-content li {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  line-height: 1.6;
 }
 
-/* KaTeX styles will be imported from the katex package */
+.preview-content ul li {
+  list-style-type: none;
+  position: relative;
+}
+
+.preview-content ul li::before {
+  content: '•';
+  color: #667eea;
+  font-size: 1.2em;
+  position: absolute;
+  left: -16px;
+}
+
+.preview-content a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.preview-content a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.preview-content strong {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.preview-content em {
+  color: #475569;
+  font-style: italic;
+}
+
+/* KaTeX math styling improvements */
+.katex-display {
+  margin: 24px 0;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.katex {
+  font-size: 1.1em;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .markdown-editor {
+    flex-direction: column;
+    padding: 4px;
+    gap: 4px;
+  }
+  
+  .editor-panel,
+  .preview-panel {
+    min-height: 50vh;
+  }
+  
+  .toolbar {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  
+  .toolbar-button {
+    padding: 6px 8px;
+    font-size: 11px;
+    min-width: 32px;
+    height: 32px;
+  }
+  
+  .editor-textarea,
+  .preview-content {
+    padding: 16px;
+  }
+}
+
+/* Loading animation for image uploads */
+.preview-content img[src*="data:image/svg+xml"] {
+  opacity: 0.7;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}

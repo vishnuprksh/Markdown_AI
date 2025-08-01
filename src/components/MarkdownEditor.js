@@ -8,52 +8,101 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import UserProfile from './UserProfile';
 
 const MarkdownEditor = () => {
-  const [markdown, setMarkdown] = useState(`# Markdown AI Editor
+  const [markdown, setMarkdown] = useState(`# 🚀 Markdown AI Editor
 
-Welcome to your simple markdown editor with **LaTeX** and image support!
+Welcome to your **enhanced** markdown editor with beautiful styling, **LaTeX** support, and seamless image uploads!
 
-## Features
+## ✨ Key Features
 
-- **Bold** and *italic* text
-- \`Inline code\` and code blocks
-- Lists and tables
-- Images and links
-- LaTeX math expressions
+- **Rich Typography** with beautiful gradients and modern design
+- *Elegant* syntax highlighting and code blocks
+- \`Enhanced inline code\` styling
+- 📊 Beautiful tables with hover effects
+- 🖼️ Drag & drop image uploads to Firebase
+- 🧮 Advanced LaTeX math rendering
+- 📱 Fully responsive design
 
-## Math Examples
+## 🧮 Math Examples
 
-Inline math: $E = mc^2$
+Inline math works beautifully: $E = mc^2$ and $f(x) = x^2 + 2x + 1$
 
-Block math:
+Block math with enhanced styling:
 $$
 \\frac{d}{dx}\\left( \\int_{0}^{x} f(u) \\, du\\right) = f(x)
 $$
 
-## Code Example
+$$
+\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}
+$$
+
+## 💻 Code Examples
+
+JavaScript with beautiful syntax highlighting:
 
 \`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
+function createAwesomeApp() {
+  const features = ['markdown', 'latex', 'images'];
+  return features.map(f => \`✅ \${f}\`).join('\\n');
 }
+
+console.log(createAwesomeApp());
 \`\`\`
 
-## Table Example
+Python example:
 
-| Feature | Supported |
-|---------|-----------|
-| Markdown | ✅ |
-| LaTeX | ✅ |
-| Images | ✅ |
-| Tables | ✅ |
+\`\`\`python
+import numpy as np
+import matplotlib.pyplot as plt
 
-## Image Example
+def plot_function(x):
+    return np.sin(x) * np.exp(-x/10)
+
+x = np.linspace(0, 20, 1000)
+y = plot_function(x)
+plt.plot(x, y, 'b-', linewidth=2)
+plt.show()
+\`\`\`
+
+## 📊 Enhanced Table
+
+| Feature | Status | Priority | Notes |
+|---------|--------|----------|-------|
+| Markdown Rendering | ✅ Complete | High | Full GFM support |
+| LaTeX Math | ✅ Complete | High | KaTeX integration |
+| Image Upload | ✅ Complete | Medium | Firebase Storage |
+| Syntax Highlighting | ✅ Complete | Medium | Prism.js powered |
+| Responsive Design | ✅ Complete | High | Mobile-friendly |
+| Dark Mode | 🚧 Planned | Low | Coming soon |
+
+## 🎨 Enhanced Styling Features
+
+> **Tip**: This blockquote demonstrates the beautiful gradient styling and improved typography that makes your content stand out!
+
+### Lists with Custom Bullets
+
+- Beautiful custom bullet points
+- Enhanced spacing and typography
+- Hover effects on interactive elements
+- Smooth animations and transitions
+
+### Numbered Lists
+
+1. First item with enhanced styling
+2. Second item with perfect spacing
+3. Third item with beautiful typography
+
+## 🖼️ Image Upload Demo
 
 ![Sample Image](/assets/sample-image.svg)
 
-> Try editing this text in the left panel to see the live preview!
-`);
+**Pro tip**: You can paste images directly from your clipboard (Ctrl+V) and they'll be automatically uploaded to Firebase Storage!
+
+---
+
+> 🎉 **Ready to create?** Start editing this text in the left panel to see the beautiful live preview in action!`);
 
   const fileInputRef = useRef(null);
 
@@ -82,19 +131,6 @@ function hello() {
       console.error('Error uploading image to Firebase:', error);
       throw error;
     }
-  };
-
-  // Convert base64 to File object
-  const base64ToFile = (base64Data, filename, mimeType) => {
-    const arr = base64Data.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mimeType || mime });
   };
 
   const handleImageUpload = async (event) => {
@@ -232,42 +268,44 @@ function hello() {
     <div className="markdown-editor">
       <div className="editor-panel">
         <div className="panel-header">
-          Markdown Editor
+          <span>📝 Markdown Editor</span>
+          <UserProfile />
         </div>
         <div className="toolbar">
-          <button className="toolbar-button" onClick={insertHeader} title="Header">
-            H
+          <button className="toolbar-button" onClick={insertHeader} title="Header (H2)">
+            <span style={{ fontSize: '14px', fontWeight: 'bold' }}>H₂</span>
           </button>
-          <button className="toolbar-button" onClick={insertBold} title="Bold">
-            <strong>B</strong>
+          <button className="toolbar-button" onClick={insertBold} title="Bold Text">
+            <strong style={{ fontSize: '14px' }}>B</strong>
           </button>
-          <button className="toolbar-button" onClick={insertItalic} title="Italic">
-            <em>I</em>
+          <button className="toolbar-button" onClick={insertItalic} title="Italic Text">
+            <em style={{ fontSize: '14px' }}>I</em>
           </button>
           <button className="toolbar-button" onClick={insertCode} title="Inline Code">
-            &lt;/&gt;
+            <span style={{ fontSize: '12px', fontFamily: 'monospace' }}>&lt;/&gt;</span>
           </button>
           <button className="toolbar-button" onClick={insertCodeBlock} title="Code Block">
-            { }
+            <span style={{ fontSize: '12px', fontFamily: 'monospace' }}>{ }</span>
           </button>
           <button className="toolbar-button" onClick={insertInlineMath} title="Inline Math">
-            $x$
+            <span style={{ fontSize: '12px' }}>f(x)</span>
           </button>
           <button className="toolbar-button" onClick={insertMath} title="Math Block">
-            $$
+            <span style={{ fontSize: '12px' }}>∑∫</span>
           </button>
-          <button className="toolbar-button" onClick={insertTable} title="Table">
-            📊
+          <button className="toolbar-button" onClick={insertTable} title="Insert Table">
+            <span style={{ fontSize: '14px' }}>⊞</span>
           </button>
           <button 
             className="toolbar-button" 
             onClick={() => fileInputRef.current?.click()}
-            title="Insert Image"
+            title="Upload Image"
           >
-            📷
+            <span style={{ fontSize: '14px' }}>�️</span>
           </button>
-          <span className="toolbar-hint" title="Paste images directly (Ctrl+V) - automatically uploaded to Firebase">
-            📋🔥
+          <div className="toolbar-separator"></div>
+          <span className="toolbar-hint" title="💡 Tip: Paste images directly (Ctrl+V) - automatically uploaded to Firebase Storage">
+            � Paste images with Ctrl+V
           </span>
           <input
             ref={fileInputRef}
@@ -282,14 +320,22 @@ function hello() {
           value={markdown}
           onChange={(e) => setMarkdown(e.target.value)}
           onPaste={handlePaste}
-          placeholder="Start typing your markdown here..."
+          placeholder="🚀 Start writing your markdown here... 
+
+✨ Features:
+• **Bold** and *italic* text
+• Headers with # ## ###
+• Code blocks with ```
+• Math expressions with $ or $$
+• Tables, lists, and links
+• Drag & drop or paste images"
           spellCheck="false"
         />
       </div>
       
       <div className="preview-panel">
         <div className="panel-header">
-          Preview
+          👁️ Live Preview
         </div>
         <div className="preview-content">
           <ReactMarkdown
