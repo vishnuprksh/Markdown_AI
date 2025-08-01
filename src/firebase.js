@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration using environment variables
 // Make sure to set these in your .env file
@@ -46,4 +47,8 @@ googleProvider.setCustomParameters({
 
 // Initialize Firebase Storage
 export const storage = getStorage(app);
+
+// Initialize Firestore
+export const db = getFirestore(app);
+
 export default app;

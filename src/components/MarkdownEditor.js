@@ -8,102 +8,40 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import UserProfile from './UserProfile';
+import { useAuth } from '../contexts/AuthContext';
+import { documentService } from '../services/documentService';
+import { firestoreTestService } from '../services/firestoreTestService';
+import TopMenu from './TopMenu';
+import CollectionsModal from './CollectionsModal';
 import AIModal from './AIModal';
 
 const MarkdownEditor = () => {
-  const [markdown, setMarkdown] = useState(`# 🚀 Markdown AI Editor
+  const { user } = useAuth();
+  
+  // Document management state
+  const [currentDocumentId, setCurrentDocumentId] = useState(null);
+  const [documentTitle, setDocumentTitle] = useState('Untitled.md');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
+  const [originalContent, setOriginalContent] = useState('');
+  const [firestoreStatus, setFirestoreStatus] = useState('untested'); // untested, testing, success, error
+  const [saveStatus, setSaveStatus] = useState('idle'); // idle, saving, saved, error
+  
+  const [markdown, setMarkdown] = useState(`# 🚀 Welcome to Markdown AI Editor
 
-Welcome to your **enhanced** markdown editor with beautiful styling, **LaTeX** support, and seamless image uploads!
+Start writing your **markdown** content here! This document will be automatically saved when you click the save button.
 
-## ✨ Key Features
-
-- **Rich Typography** with beautiful gradients and modern design
-- *Elegant* syntax highlighting and code blocks
-- \`Enhanced inline code\` styling
-- 📊 Beautiful tables with hover effects
-- 🖼️ Drag & drop image uploads to Firebase
-- 🧮 Advanced LaTeX math rendering
-- 📱 Fully responsive design
-
-## 🧮 Math Examples
-
-Inline math works beautifully: $E = mc^2$ and $f(x) = x^2 + 2x + 1$
-
-Block math with enhanced styling:
-$$
-\\frac{d}{dx}\\left( \\int_{0}^{x} f(u) \\, du\\right) = f(x)
-$$
-
-$$
-\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}
-$$
-
-## 💻 Code Examples
-
-JavaScript with beautiful syntax highlighting:
-
-\`\`\`javascript
-function createAwesomeApp() {
-  const features = ['markdown', 'latex', 'images'];
-  return features.map(f => \`✅ \${f}\`).join('\\n');
-}
-
-console.log(createAwesomeApp());
-\`\`\`
-
-Python example:
-
-\`\`\`python
-import numpy as np
-import matplotlib.pyplot as plt
-
-def plot_function(x):
-    return np.sin(x) * np.exp(-x/10)
-
-x = np.linspace(0, 20, 1000)
-y = plot_function(x)
-plt.plot(x, y, 'b-', linewidth=2)
-plt.show()
-\`\`\`
-
-## 📊 Enhanced Table
-
-| Feature | Status | Priority | Notes |
-|---------|--------|----------|-------|
-| Markdown Rendering | ✅ Complete | High | Full GFM support |
-| LaTeX Math | ✅ Complete | High | KaTeX integration |
-| Image Upload | ✅ Complete | Medium | Firebase Storage |
-| Syntax Highlighting | ✅ Complete | Medium | Prism.js powered |
-| Responsive Design | ✅ Complete | High | Mobile-friendly |
-| Dark Mode | 🚧 Planned | Low | Coming soon |
-
-## 🎨 Enhanced Styling Features
-
-> **Tip**: This blockquote demonstrates the beautiful gradient styling and improved typography that makes your content stand out!
-
-### Lists with Custom Bullets
-
-- Beautiful custom bullet points
-- Enhanced spacing and typography
-- Hover effects on interactive elements
-- Smooth animations and transitions
-
-### Numbered Lists
-
-1. First item with enhanced styling
-2. Second item with perfect spacing
-3. Third item with beautiful typography
-
-## 🖼️ Image Upload Demo
-
-![Sample Image](/assets/sample-image.svg)
-
-**Pro tip**: You can paste images directly from your clipboard (Ctrl+V) and they'll be automatically uploaded to Firebase Storage!
+## ✨ Features
+- Beautiful live preview
+- Math support with LaTeX
+- Image uploads
+- AI assistance
+- Auto-save functionality
+- Collections management
 
 ---
 
-> 🎉 **Ready to create?** Start editing this text in the left panel to see the beautiful live preview in action!`);
+*Happy writing!* 📝`);
 
   // Undo history state
   const [undoHistory, setUndoHistory] = useState([]);
@@ -117,6 +55,205 @@ plt.show()
 
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
+
+  // Initialize with default content and track changes
+  useEffect(() => {
+    setOriginalContent(markdown);
+  }, []);
+
+  // Track unsaved changes
+  useEffect(() => {
+    setHasUnsavedChanges(markdown !== originalContent);
+  }, [markdown, originalContent]);
+
+  // Reset save status when content changes after saving
+  useEffect(() => {
+    if (saveStatus === 'saved' && markdown !== originalContent) {
+      setSaveStatus('idle');
+    }
+  }, [markdown, originalContent, saveStatus]);
+
+  // Document management functions
+  const handleNewDocument = async () => {
+    if (hasUnsavedChanges) {
+      if (!window.confirm('You have unsaved changes. Create a new document anyway?')) {
+        return;
+      }
+    }
+    
+    setCurrentDocumentId(null);
+    
+    // Generate a unique title for new documents
+    let newTitle = 'Untitled';
+    if (user) {
+      try {
+        newTitle = await documentService.generateUniqueTitle(user.uid, 'Untitled');
+      } catch (error) {
+        console.warn('Could not generate unique title, using default:', error);
+        // Fallback to timestamp-based naming
+        newTitle = `Untitled ${new Date().toLocaleDateString()}`;
+      }
+    }
+    
+    setDocumentTitle(newTitle + '.md');
+    const newContent = `# 🚀 New Document
+
+Start writing your **markdown** content here!
+
+---
+
+*Happy writing!* 📝`;
+    setMarkdown(newContent);
+    setOriginalContent(newContent);
+    setHasUnsavedChanges(false);
+  };
+
+  const handleSaveDocument = async () => {
+    if (!user) {
+      alert('Please log in to save documents');
+      return;
+    }
+
+    console.log('Attempting to save document:', {
+      userId: user.uid,
+      title: documentTitle.replace('.md', ''),
+      contentLength: markdown.length,
+      currentDocumentId
+    });
+
+    try {
+      // Set saving status
+      setSaveStatus('saving');
+        
+      const docId = await documentService.saveDocument(
+        user.uid,
+        documentTitle.replace('.md', ''), // Remove .md extension for storage
+        markdown,
+        currentDocumentId
+      );
+      
+      if (!currentDocumentId) {
+        setCurrentDocumentId(docId);
+      }
+      
+      setOriginalContent(markdown);
+      setHasUnsavedChanges(false);
+      
+      // Show success status briefly
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setSaveStatus('idle');
+      }, 2000);
+      
+      console.log('Document saved successfully:', docId);
+    } catch (error) {
+      console.error('Error saving document:', error);
+      
+      // Set error status
+      setSaveStatus('error');
+      setTimeout(() => {
+        setSaveStatus('idle');
+      }, 3000);
+      
+      // Show more specific error message
+      if (error.message.includes('Missing or insufficient permissions')) {
+        alert('Permission denied. Please check your Firestore security rules.');
+      } else if (error.message.includes('Failed to get document')) {
+        alert('Network error. Please check your internet connection and try again.');
+      } else if (error.message.includes('already exists')) {
+        // Handle duplicate name error with better UX
+        const suggestedTitleMatch = error.message.match(/Suggested alternative: "([^"]+)"/);
+        if (suggestedTitleMatch) {
+          const suggestedTitle = suggestedTitleMatch[1];
+          const userChoice = window.confirm(
+            `${error.message}\n\nWould you like to use the suggested title "${suggestedTitle}"?`
+          );
+          if (userChoice) {
+            setDocumentTitle(suggestedTitle + '.md');
+            // Don't show error status since user accepted the suggestion
+            setSaveStatus('idle');
+            return; // Exit early to avoid showing error
+          }
+        }
+        alert(error.message);
+      } else {
+        alert(`Failed to save document: ${error.message}`);
+      }
+    }
+  };
+
+  const handleSelectDocument = async (document) => {
+    if (hasUnsavedChanges) {
+      if (!window.confirm('You have unsaved changes. Load a different document anyway?')) {
+        return;
+      }
+    }
+
+    try {
+      setCurrentDocumentId(document.id);
+      setDocumentTitle(document.title + '.md');
+      setMarkdown(document.content);
+      setOriginalContent(document.content);
+      setHasUnsavedChanges(false);
+      setIsCollectionsOpen(false);
+    } catch (error) {
+      console.error('Error loading document:', error);
+      alert('Failed to load document. Please try again.');
+    }
+  };
+
+  const handleDocumentTitleChange = (newTitle) => {
+    setDocumentTitle(newTitle.endsWith('.md') ? newTitle : newTitle + '.md');
+  };
+
+  // Test Firestore connection with comprehensive testing
+  const testFirestoreConnection = async () => {
+    if (!user) {
+      console.log('No user logged in for Firestore test');
+      setFirestoreStatus('error');
+      return;
+    }
+
+    console.log('🔧 Starting comprehensive Firestore tests...');
+    setFirestoreStatus('testing');
+    
+    try {
+      // Clean up any existing test documents first
+      await firestoreTestService.cleanupTestDocuments(user.uid);
+      
+      // Test 1: Basic write operation
+      const writeTest = await firestoreTestService.testBasicWrite(user.uid);
+      if (!writeTest.success) {
+        console.error('❌ Basic write test failed:', writeTest.error);
+        setFirestoreStatus('error');
+        return false;
+      }
+
+      // Test 2: Collection write (now uses test collection with auto-cleanup)
+      const collectionTest = await firestoreTestService.testCollectionWrite(user.uid);
+      if (!collectionTest.success) {
+        console.error('❌ Collection write test failed:', collectionTest.error);
+        setFirestoreStatus('error');
+        return false;
+      }
+
+      console.log('✅ All Firestore tests passed successfully!');
+      setFirestoreStatus('success');
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Firestore tests failed with exception:', error);
+      setFirestoreStatus('error');
+      return false;
+    }
+  };
+
+  // Test Firestore when user changes
+  useEffect(() => {
+    if (user) {
+      testFirestoreConnection();
+    }
+  }, [user]);
 
   const handleCloseAIModal = () => {
     setIsAIModalOpen(false);
@@ -392,12 +529,23 @@ plt.show()
   };
 
   return (
-    <div className="markdown-editor">
-      <div className="editor-panel">
-        <div className="panel-header">
-          <span>📝 Markdown Editor</span>
-          <UserProfile />
-        </div>
+    <div className="app-container">
+      <TopMenu
+        onNewDocument={handleNewDocument}
+        onSaveDocument={handleSaveDocument}
+        onOpenCollections={() => setIsCollectionsOpen(true)}
+        currentDocumentTitle={documentTitle}
+        hasUnsavedChanges={hasUnsavedChanges}
+        onDocumentTitleChange={handleDocumentTitleChange}
+        firestoreStatus={firestoreStatus}
+        saveStatus={saveStatus}
+      />
+      
+      <div className="markdown-editor">
+        <div className="editor-panel">
+          <div className="panel-header">
+            <span>📝 Editor</span>
+          </div>
         <div className="toolbar">
           <button className="toolbar-button" onClick={insertHeader} title="Header (H2)">
             <span style={{ fontSize: '14px', fontWeight: 'bold' }}>H₂</span>
@@ -456,9 +604,6 @@ plt.show()
             <span style={{ fontSize: '14px' }}>↷</span>
           </button>
           <div className="toolbar-separator"></div>
-          <span className="toolbar-hint" title="💡 Tip: Paste images directly (Ctrl+V) - automatically uploaded to Firebase Storage">
-            💡 Paste images with Ctrl+V
-          </span>
           <input
             ref={fileInputRef}
             type="file"
@@ -527,12 +672,20 @@ plt.show()
         </div>
       </div>
       
+      </div> {/* Close markdown-editor div */}
+      
       <AIModal
         isOpen={isAIModalOpen}
         onClose={handleCloseAIModal}
         onApply={handleAIApply}
         selectedText={selectedText}
         fullContent={markdown}
+      />
+      
+      <CollectionsModal
+        isOpen={isCollectionsOpen}
+        onClose={() => setIsCollectionsOpen(false)}
+        onSelectDocument={handleSelectDocument}
       />
     </div>
   );
