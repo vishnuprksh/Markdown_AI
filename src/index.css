@@ -159,8 +159,53 @@ code {
   box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
 }
 
+.toolbar-button.ai-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-color: transparent;
+  font-weight: 600;
+  animation: aiPulse 2s infinite;
+}
+
+.toolbar-button.ai-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+}
+
+.toolbar-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+}
+
+.toolbar-button:disabled:hover {
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+@keyframes aiPulse {
+  0%, 100% { 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% { 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 4px rgba(16, 185, 129, 0.2);
+  }
+}
+
 .file-input {
   display: none;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(to bottom, transparent 0%, #cbd5e1 20%, #cbd5e1 80%, transparent 100%);
+  margin: 0 4px;
 }
 
 .toolbar-hint {
