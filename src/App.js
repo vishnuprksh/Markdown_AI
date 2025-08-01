@@ -1,7 +1,9 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import MarkdownEditor from './components/MarkdownEditor';
 import Login from './components/Login';
+import SharedDocument from './components/SharedDocument';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 
 function AppContent() {
@@ -39,11 +41,16 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="App">
-        <AppContent />
-      </div>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <div className="App">
+          <Routes>
+            <Route path="/share/:shareId" element={<SharedDocument />} />
+            <Route path="/" element={<AppContent />} />
+          </Routes>
+        </div>
+      </AuthProvider>
+    </Router>
   );
 }
 

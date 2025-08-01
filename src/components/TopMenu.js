@@ -4,7 +4,8 @@ import UserProfile from './UserProfile';
 const TopMenu = ({ 
   onNewDocument, 
   onSaveDocument, 
-  onOpenCollections, 
+  onOpenCollections,
+  onShare, 
   currentDocumentTitle,
   hasUnsavedChanges,
   onDocumentTitleChange,
@@ -123,6 +124,15 @@ const TopMenu = ({
           >
             <span className="button-icon">📚</span>
             Collections
+          </button>
+          
+          <button 
+            className="menu-button share-button" 
+            onClick={onShare}
+            title="Share document with others"
+          >
+            <span className="button-icon">🔗</span>
+            Share
           </button>
         </div>
       </div>

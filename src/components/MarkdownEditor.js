@@ -14,6 +14,8 @@ import { firestoreTestService } from '../services/firestoreTestService';
 import TopMenu from './TopMenu';
 import CollectionsModal from './CollectionsModal';
 import AIModal from './AIModal';
+import ShareModal from './ShareModal';
+import { shareService } from '../services/shareService';
 
 const MarkdownEditor = () => {
   const { user } = useAuth();
@@ -52,6 +54,9 @@ Start writing your **markdown** content here! This document will be automaticall
   const [selectedText, setSelectedText] = useState('');
   const [selectionStart, setSelectionStart] = useState(0);
   const [selectionEnd, setSelectionEnd] = useState(0);
+
+  // Share Modal state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
@@ -258,6 +263,56 @@ Start writing your **markdown** content here!
   const handleCloseAIModal = () => {
     setIsAIModalOpen(false);
     setSelectedText('');
+  };
+
+  // Share functionality
+  const handleShare = async (isPublic = true) => {
+    if (!user) {
+      alert('Please log in to share documents');
+      return;
+    }
+
+    console.log('Starting share process:', {
+      userId: user.uid,
+      documentTitle,
+      markdownLength: markdown.length,
+      isPublic
+    });
+
+    try {
+      // Create shareable document in Firestore
+      const shareId = await shareService.createShareableDocument(
+        user.uid,
+        documentTitle,
+        markdown,
+        isPublic
+      );
+
+      console.log('Share document created successfully:', shareId);
+
+      // Generate share URL
+      const shareUrl = shareService.generateShareURL(shareId);
+      
+      // Generate preview URL (data URL for immediate preview)
+      const previewUrl = shareService.generateDataURL(documentTitle, markdown);
+
+      return {
+        shareUrl,
+        previewUrl,
+        shareId
+      };
+    } catch (error) {
+      console.error('Error creating share link:', error);
+      throw error;
+    }
+  };
+
+  const handleOpenShareModal = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setIsShareModalOpen(false);
   };
 
   // Undo functionality
@@ -534,6 +589,7 @@ Start writing your **markdown** content here!
         onNewDocument={handleNewDocument}
         onSaveDocument={handleSaveDocument}
         onOpenCollections={() => setIsCollectionsOpen(true)}
+        onShare={handleOpenShareModal}
         currentDocumentTitle={documentTitle}
         hasUnsavedChanges={hasUnsavedChanges}
         onDocumentTitleChange={handleDocumentTitleChange}
@@ -680,6 +736,14 @@ Start writing your **markdown** content here!
         onApply={handleAIApply}
         selectedText={selectedText}
         fullContent={markdown}
+      />
+      
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={handleCloseShareModal}
+        onShare={handleShare}
+        documentTitle={documentTitle}
+        markdown={markdown}
       />
       
       <CollectionsModal
