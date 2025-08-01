@@ -42,3 +42,9 @@ Thumbs.db
 # Temporary folders
 tmp/
 temp/
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log*
+firebase-debug.*.log*
