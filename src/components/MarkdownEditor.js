@@ -32,21 +32,16 @@ const MarkdownEditor = () => {
   const [originalContent, setOriginalContent] = useState('');
   const [saveStatus, setSaveStatus] = useState('idle'); // idle, saving, saved, error
   
-  const [markdown, setMarkdown] = useState(`# 🚀 Welcome to Markdown AI Editor
+  const [markdown, setMarkdown] = useState(`# Welcome to Markdown AI Editor
 
 Start writing your **markdown** content here! This document will be automatically saved when you click the save button.
 
-## ✨ Features
+## Features
 - Beautiful live preview
 - Math support with LaTeX
 - Image uploads
 - AI assistance
-- Auto-save functionality
-- Collections management
-
----
-
-*Happy writing!* 📝`);
+- Collections management`);
 
   // Undo history state
   const [undoHistory, setUndoHistory] = useState([]);
@@ -57,6 +52,8 @@ Start writing your **markdown** content here! This document will be automaticall
   const [selectedText, setSelectedText] = useState('');
   const [selectionStart, setSelectionStart] = useState(0);
   const [selectionEnd, setSelectionEnd] = useState(0);
+  const [showFloatingAI, setShowFloatingAI] = useState(false);
+  const [floatingAIPosition, setFloatingAIPosition] = useState({ x: 0, y: 0 });
 
   // Share Modal state
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -87,6 +84,32 @@ Start writing your **markdown** content here! This document will be automaticall
     }
   }, [markdown, originalContent, saveStatus]);
 
+  // Hide floating AI button when clicking outside
+  useEffect(() => {
+    const handleGlobalClick = (event) => {
+      if (!showFloatingAI) return;
+      
+      const isFloatingButton = event.target.closest('.floating-ai-button');
+      const isTextarea = event.target.closest('.editor-textarea');
+      
+      // If clicking outside both the floating button and textarea, hide it
+      if (!isFloatingButton && !isTextarea) {
+        setShowFloatingAI(false);
+        setSelectedText('');
+      }
+    };
+
+    // Add listener with slight delay to avoid conflicts
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleGlobalClick, true);
+    }, 0);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('click', handleGlobalClick, true);
+    };
+  }, [showFloatingAI]);
+
   // Document management functions
   const handleNewDocument = async () => {
     if (hasUnsavedChanges) {
@@ -110,13 +133,9 @@ Start writing your **markdown** content here! This document will be automaticall
     }
     
     setDocumentTitle(newTitle + '.md');
-    const newContent = `# 🚀 New Document
+    const newContent = `# New Document
 
-Start writing your **markdown** content here!
-
----
-
-*Happy writing!* 📝`;
+Start writing your **markdown** content here!`;
     setMarkdown(newContent);
     setOriginalContent(newContent);
     setHasUnsavedChanges(false);
@@ -223,6 +242,7 @@ Start writing your **markdown** content here!
   const handleCloseAIModal = () => {
     setIsAIModalOpen(false);
     setSelectedText('');
+    setShowFloatingAI(false);
   };
 
   // Share functionality
@@ -493,6 +513,56 @@ Start writing your **markdown** content here!
     }
   };
 
+  const handleTextSelection = (e) => {
+    const textarea = e.target;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = markdown.substring(start, end);
+    
+    if (selected.length > 0) {
+      // Calculate position at the end of selection
+      const textBeforeSelection = markdown.substring(0, end);
+      const lines = textBeforeSelection.split('\n');
+      const currentLine = lines.length - 1;
+      const currentColumn = lines[lines.length - 1].length;
+      
+      // Get textarea styling
+      const computedStyle = window.getComputedStyle(textarea);
+      const fontSize = parseInt(computedStyle.fontSize) || 16;
+      const lineHeight = parseInt(computedStyle.lineHeight) || fontSize * 1.2;
+      const paddingLeft = parseInt(computedStyle.paddingLeft) || 8;
+      const paddingTop = parseInt(computedStyle.paddingTop) || 8;
+      
+      // Calculate character width (approximate)
+      const charWidth = fontSize * 0.6; // Approximate character width
+      
+      // Get textarea position
+      const rect = textarea.getBoundingClientRect();
+      
+      // Calculate position at end of selection
+      const x = rect.left + paddingLeft + (currentColumn * charWidth);
+      const y = rect.top + paddingTop + (currentLine * lineHeight) - textarea.scrollTop + lineHeight;
+      
+      setSelectedText(selected);
+      setSelectionStart(start);
+      setSelectionEnd(end);
+      setFloatingAIPosition({
+        x: Math.min(x, window.innerWidth - 80), // Ensure it doesn't go off screen
+        y: Math.min(y, window.innerHeight - 50)
+      });
+      setShowFloatingAI(true);
+    } else {
+      // Hide floating AI button when no text is selected
+      setShowFloatingAI(false);
+      setSelectedText('');
+    }
+  };
+
+  const handleFloatingAIClick = () => {
+    setIsAIModalOpen(true);
+    setShowFloatingAI(false);
+  };
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -739,7 +809,7 @@ Start writing your **markdown** content here!
             <span style={{ fontSize: '12px', fontFamily: 'monospace' }}>&lt;/&gt;</span>
           </button>
           <button className="toolbar-button" onClick={insertCodeBlock} title="Code Block">
-            <span style={{ fontSize: '12px', fontFamily: 'monospace' }}>{ }</span>
+            <span style={{ fontSize: '14px' }}>▦</span>
           </button>
           <button className="toolbar-button" onClick={insertInlineMath} title="Inline Math">
             <span style={{ fontSize: '12px' }}>f(x)</span>
@@ -808,6 +878,9 @@ Start writing your **markdown** content here!
             }
             setMarkdown(newValue);
           }}
+          onSelect={handleTextSelection}
+          onMouseUp={handleTextSelection}
+          onKeyUp={handleTextSelection}
           onPaste={handlePaste}
           placeholder="🚀 Start writing your markdown here... 
 
@@ -865,6 +938,23 @@ Start writing your **markdown** content here!
       </div>
       
       </div> {/* Close markdown-editor div */}
+      
+      {/* Floating AI Assistant Button */}
+      {showFloatingAI && (
+        <div 
+          className="floating-ai-button"
+          style={{
+            position: 'fixed',
+            left: `${floatingAIPosition.x}px`,
+            top: `${floatingAIPosition.y}px`,
+            zIndex: 999
+          }}
+          onClick={handleFloatingAIClick}
+          title="Enhance selected text with AI"
+        >
+          🤖 AI
+        </div>
+      )}
       
       <AIModal
         isOpen={isAIModalOpen}

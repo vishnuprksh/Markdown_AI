@@ -968,3 +968,31 @@ code {
     max-height: 90vh;
   }
 }
+
+/* Floating AI Button */
+.floating-ai-button {
+  background: #B00020;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.floating-ai-button:hover {
+  background: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.floating-ai-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}

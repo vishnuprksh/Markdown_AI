@@ -100,11 +100,8 @@ const AIModal = ({ isOpen, onClose, onApply, selectedText, fullContent }) => {
 
 Examples:
 • Improve grammar and clarity
-• Make this more professional
 • Convert to a how-to guide
 • Add more technical details
-• Rewrite in a casual tone
-• Fix spelling and formatting
 • Summarize the main points"
               rows={8}
             />
