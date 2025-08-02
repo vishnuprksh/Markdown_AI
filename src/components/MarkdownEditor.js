@@ -406,6 +406,34 @@ Start writing your **markdown** content here!
     }
   };
 
+  // Markdown file download functionality
+  const handleDownloadMarkdown = () => {
+    try {
+      // Create blob with markdown content
+      const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+      
+      // Create download URL
+      const url = URL.createObjectURL(blob);
+      
+      // Create temporary download link
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = documentTitle.endsWith('.md') ? documentTitle : `${documentTitle}.md`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error downloading markdown file:', error);
+      alert('Failed to download markdown file. Please try again.');
+    }
+  };
+
   const getDownloadButtonContent = () => {
     switch (downloadStatus) {
       case 'generating':
@@ -719,6 +747,13 @@ Start writing your **markdown** content here!
         <div className="editor-panel">
           <div className="panel-header">
             <span>📝 Editor</span>
+            <button 
+              className="download-button"
+              onClick={handleDownloadMarkdown}
+              title="Download as Markdown file"
+            >
+              📄
+            </button>
           </div>
         <div className="toolbar">
           <button className="toolbar-button" onClick={insertHeader} title="Header (H2)">
