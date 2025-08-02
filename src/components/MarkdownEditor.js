@@ -11,7 +11,6 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
 import { useSettings } from '../contexts/SettingsContext';
 import { documentService } from '../services/documentService';
-import { firestoreTestService } from '../services/firestoreTestService';
 import TopMenu from './TopMenu';
 import CollectionsModal from './CollectionsModal';
 import AIModal from './AIModal';
@@ -31,7 +30,6 @@ const MarkdownEditor = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
   const [originalContent, setOriginalContent] = useState('');
-  const [firestoreStatus, setFirestoreStatus] = useState('untested'); // untested, testing, success, error
   const [saveStatus, setSaveStatus] = useState('idle'); // idle, saving, saved, error
   
   const [markdown, setMarkdown] = useState(`# 🚀 Welcome to Markdown AI Editor
@@ -221,55 +219,6 @@ Start writing your **markdown** content here!
   const handleDocumentTitleChange = (newTitle) => {
     setDocumentTitle(newTitle.endsWith('.md') ? newTitle : newTitle + '.md');
   };
-
-  // Test Firestore connection with comprehensive testing
-  const testFirestoreConnection = async () => {
-    if (!user) {
-      console.log('No user logged in for Firestore test');
-      setFirestoreStatus('error');
-      return;
-    }
-
-    console.log('🔧 Starting comprehensive Firestore tests...');
-    setFirestoreStatus('testing');
-    
-    try {
-      // Clean up any existing test documents first
-      await firestoreTestService.cleanupTestDocuments(user.uid);
-      
-      // Test 1: Basic write operation
-      const writeTest = await firestoreTestService.testBasicWrite(user.uid);
-      if (!writeTest.success) {
-        console.error('❌ Basic write test failed:', writeTest.error);
-        setFirestoreStatus('error');
-        return false;
-      }
-
-      // Test 2: Collection write (now uses test collection with auto-cleanup)
-      const collectionTest = await firestoreTestService.testCollectionWrite(user.uid);
-      if (!collectionTest.success) {
-        console.error('❌ Collection write test failed:', collectionTest.error);
-        setFirestoreStatus('error');
-        return false;
-      }
-
-      console.log('✅ All Firestore tests passed successfully!');
-      setFirestoreStatus('success');
-      return true;
-      
-    } catch (error) {
-      console.error('❌ Firestore tests failed with exception:', error);
-      setFirestoreStatus('error');
-      return false;
-    }
-  };
-
-  // Test Firestore when user changes
-  useEffect(() => {
-    if (user) {
-      testFirestoreConnection();
-    }
-  }, [user]);
 
   const handleCloseAIModal = () => {
     setIsAIModalOpen(false);
@@ -478,17 +427,35 @@ Start writing your **markdown** content here!
 
   const handleUndo = useCallback(() => {
     if (currentUndoIndex > 0) {
+      const textarea = textareaRef.current;
+      const scrollTop = textarea?.scrollTop || 0; // Preserve scroll position
       const previousContent = undoHistory[currentUndoIndex - 1];
       setMarkdown(previousContent);
       setCurrentUndoIndex(prev => prev - 1);
+      
+      // Restore scroll position after state update
+      setTimeout(() => {
+        if (textarea) {
+          textarea.scrollTop = scrollTop;
+        }
+      }, 0);
     }
   }, [currentUndoIndex, undoHistory]);
 
   const handleRedo = useCallback(() => {
     if (currentUndoIndex < undoHistory.length - 1) {
+      const textarea = textareaRef.current;
+      const scrollTop = textarea?.scrollTop || 0; // Preserve scroll position
       const nextContent = undoHistory[currentUndoIndex + 1];
       setMarkdown(nextContent);
       setCurrentUndoIndex(prev => prev + 1);
+      
+      // Restore scroll position after state update
+      setTimeout(() => {
+        if (textarea) {
+          textarea.scrollTop = scrollTop;
+        }
+      }, 0);
     }
   }, [currentUndoIndex, undoHistory]);
 
@@ -640,6 +607,7 @@ Start writing your **markdown** content here!
             const textarea = event.target;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
+            const scrollTop = textarea.scrollTop; // Preserve scroll position
             const uploadingMarkdown = `\n![Uploading pasted image...](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjEwMCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY2NiI+VXBsb2FkaW5nLi4uPC90ZXh0Pjwvc3ZnPg==)\n`;
             
             const newText = markdown.substring(0, start) + uploadingMarkdown + markdown.substring(end);
@@ -656,9 +624,10 @@ Start writing your **markdown** content here!
               return newContent;
             });
             
-            // Restore cursor position after the inserted image
+            // Restore cursor position and scroll position after the inserted image
             setTimeout(() => {
               textarea.focus();
+              textarea.scrollTop = scrollTop; // Restore scroll position
               const newPosition = start + imageMarkdown.length;
               textarea.setSelectionRange(newPosition, newPosition);
             }, 100);
@@ -679,13 +648,15 @@ Start writing your **markdown** content here!
     const textarea = textareaRef.current || document.querySelector('.editor-textarea');
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
+    const scrollTop = textarea.scrollTop; // Preserve scroll position
     const selectedText = markdown.substring(start, end);
     const newText = markdown.substring(0, start) + before + selectedText + after + markdown.substring(end);
     updateMarkdown(newText);
     
-    // Restore cursor position
+    // Restore cursor position and scroll position
     setTimeout(() => {
       textarea.focus();
+      textarea.scrollTop = scrollTop; // Restore scroll position
       textarea.setSelectionRange(start + before.length, end + before.length);
     }, 0);
   };
@@ -739,7 +710,6 @@ Start writing your **markdown** content here!
         currentDocumentTitle={documentTitle}
         hasUnsavedChanges={hasUnsavedChanges}
         onDocumentTitleChange={handleDocumentTitleChange}
-        firestoreStatus={firestoreStatus}
         saveStatus={saveStatus}
       />
       

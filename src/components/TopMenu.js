@@ -10,7 +10,6 @@ const TopMenu = ({
   currentDocumentTitle,
   hasUnsavedChanges,
   onDocumentTitleChange,
-  firestoreStatus = 'untested',
   saveStatus = 'idle'
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -32,24 +31,6 @@ const TopMenu = ({
     } else if (e.key === 'Escape') {
       setIsEditingTitle(false);
       setTempTitle(currentDocumentTitle);
-    }
-  };
-
-  const getFirestoreStatusIcon = () => {
-    switch (firestoreStatus) {
-      case 'testing': return '🔄';
-      case 'success': return '✅';
-      case 'error': return '❌';
-      default: return '⚪';
-    }
-  };
-
-  const getFirestoreStatusTitle = () => {
-    switch (firestoreStatus) {
-      case 'testing': return 'Testing Firestore connection...';
-      case 'success': return 'Firestore connected successfully';
-      case 'error': return 'Firestore connection failed - check console for details';
-      default: return 'Firestore status unknown';
     }
   };
 
@@ -95,7 +76,40 @@ const TopMenu = ({
     <div className="top-menu">
       <div className="menu-left">
         <div className="app-logo">
-          <span className="logo-icon">📝</span>
+          <svg className="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#000000"/>
+                <stop offset="100%" stopColor="#B00020"/>
+              </linearGradient>
+            </defs>
+            
+            {/* Main document shape */}
+            <rect x="4" y="6" width="18" height="22" rx="2" fill="white" stroke="url(#logoGradient)" strokeWidth="1.5"/>
+            
+            {/* Markdown symbol - stylized M */}
+            <path d="M8 12 L10 16 L12 12 L14 16 L16 12" stroke="url(#logoGradient)" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            
+            {/* Text lines */}
+            <line x1="8" y1="19" x2="16" y2="19" stroke="url(#logoGradient)" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+            <line x1="8" y1="21.5" x2="14" y2="21.5" stroke="url(#logoGradient)" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+            <line x1="8" y1="24" x2="15" y2="24" stroke="url(#logoGradient)" strokeWidth="1" strokeLinecap="round" opacity="0.6"/>
+            
+            {/* AI circuit pattern */}
+            <circle cx="25" cy="9" r="5" fill="url(#logoGradient)" opacity="0.1"/>
+            <circle cx="25" cy="9" r="5" stroke="url(#logoGradient)" strokeWidth="1.5" fill="none"/>
+            
+            {/* Neural network nodes */}
+            <circle cx="23" cy="7" r="1" fill="url(#logoGradient)"/>
+            <circle cx="27" cy="7" r="1" fill="url(#logoGradient)"/>
+            <circle cx="25" cy="11" r="1" fill="url(#logoGradient)"/>
+            <circle cx="25" cy="9" r="0.5" fill="url(#logoGradient)"/>
+            
+            {/* Neural connections */}
+            <line x1="23" y1="7" x2="25" y2="9" stroke="url(#logoGradient)" strokeWidth="0.8" opacity="0.7"/>
+            <line x1="27" y1="7" x2="25" y2="9" stroke="url(#logoGradient)" strokeWidth="0.8" opacity="0.7"/>
+            <line x1="25" y1="9" x2="25" y2="11" stroke="url(#logoGradient)" strokeWidth="0.8" opacity="0.7"/>
+          </svg>
           <span className="logo-text">Markdown AI</span>
         </div>
         
@@ -170,21 +184,6 @@ const TopMenu = ({
       </div>
 
       <div className="menu-right">
-        <div 
-          className="firestore-status" 
-          title={getFirestoreStatusTitle()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            marginRight: '12px',
-            fontSize: '12px',
-            color: '#64748b'
-          }}
-        >
-          <span>{getFirestoreStatusIcon()}</span>
-          <span>DB</span>
-        </div>
         <UserProfile />
       </div>
     </div>

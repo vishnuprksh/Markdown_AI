@@ -13,8 +13,8 @@
 }
 
 .settings-modal {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 0;
   width: 90%;
   max-width: 600px;
   max-height: 80vh;
@@ -22,6 +22,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  border: 2px solid #000000;
 }
 
 .settings-header {
@@ -29,9 +30,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  border-bottom: 2px solid #B00020;
+  background: #000000;
+  color: #ffffff;
 }
 
 .settings-header h2 {
@@ -41,12 +42,12 @@
 }
 
 .close-button {
-  background: rgba(255, 255, 255, 0.2);
+  background: #B00020;
   border: none;
-  color: white;
+  color: #ffffff;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -56,13 +57,14 @@
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  color: #000000;
 }
 
 .settings-tabs {
   display: flex;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-bottom: 2px solid #000000;
+  background: #ffffff;
 }
 
 .tab-button {
@@ -73,20 +75,20 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #64748b;
+  color: #000000;
   transition: all 0.2s;
   border-bottom: 2px solid transparent;
 }
 
 .tab-button:hover {
-  background: #e2e8f0;
-  color: #334155;
+  background: #000000;
+  color: #ffffff;
 }
 
 .tab-button.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
-  background: white;
+  color: #B00020;
+  border-bottom-color: #B00020;
+  background: #ffffff;
 }
 
 .settings-content {
@@ -99,13 +101,13 @@
   margin: 0 0 20px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1e293b;
+  color: #000000;
 }
 
 .setting-item {
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #000000;
 }
 
 .setting-item:last-child {
@@ -116,7 +118,7 @@
 .setting-item.indented {
   margin-left: 24px;
   padding-left: 16px;
-  border-left: 2px solid #e2e8f0;
+  border-left: 2px solid #000000;
   border-bottom: none;
   margin-bottom: 12px;
 }
@@ -132,7 +134,7 @@
   margin-top: 2px;
   width: 16px;
   height: 16px;
-  accent-color: #667eea;
+  accent-color: #B00020;
 }
 
 .setting-text {
@@ -144,43 +146,44 @@
 
 .setting-text strong {
   font-weight: 500;
-  color: #1e293b;
+  color: #000000;
   font-size: 14px;
 }
 
 .setting-text small {
-  color: #64748b;
+  color: #000000;
   font-size: 12px;
   line-height: 1.4;
 }
 
 .setting-select {
   padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 2px solid #000000;
+  border-radius: 0;
   font-size: 14px;
-  background: white;
+  background: #ffffff;
   cursor: pointer;
   min-width: 120px;
+  color: #000000;
 }
 
 .setting-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #B00020;
+  box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.1);
 }
 
 .setting-range {
   flex: 1;
   margin: 0 12px;
-  accent-color: #667eea;
+  accent-color: #B00020;
 }
 
 .setting-value {
   min-width: 60px;
   text-align: right;
   font-weight: 500;
-  color: #667eea;
+  color: #B00020;
   font-size: 14px;
 }
 
@@ -189,16 +192,16 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border-top: 2px solid #000000;
+  background: #ffffff;
 }
 
 .reset-button {
   padding: 8px 16px;
-  border: 1px solid #dc2626;
+  border: 2px solid #B00020;
   background: transparent;
-  color: #dc2626;
-  border-radius: 6px;
+  color: #B00020;
+  border-radius: 0;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -206,16 +209,16 @@
 }
 
 .reset-button:hover {
-  background: #dc2626;
-  color: white;
+  background: #B00020;
+  color: #ffffff;
 }
 
 .close-settings-button {
   padding: 8px 24px;
   border: none;
-  background: #667eea;
-  color: white;
-  border-radius: 6px;
+  background: #000000;
+  color: #ffffff;
+  border-radius: 0;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -223,7 +226,7 @@
 }
 
 .close-settings-button:hover {
-  background: #5a67d8;
+  background: #B00020;
 }
 
 /* Responsive design */

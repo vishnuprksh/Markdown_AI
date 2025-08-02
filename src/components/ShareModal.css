@@ -1,7 +1,7 @@
 /* ShareModal.css */
 .share-modal {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 0;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
@@ -9,6 +9,7 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   position: relative;
   animation: shareModalSlideIn 0.3s ease-out;
+  border: 2px solid #000000;
 }
 
 @keyframes shareModalSlideIn {
@@ -27,12 +28,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px 24px 16px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 2px solid #000000;
+  background: #000000;
+  color: #ffffff;
 }
 
 .modal-header h2 {
   margin: 0;
-  color: #2c3e50;
+  color: #ffffff;
   font-size: 1.5em;
   font-weight: 600;
 }
@@ -41,16 +44,16 @@
   background: none;
   border: none;
   font-size: 24px;
-  color: #6c757d;
+  color: #ffffff;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 0;
   transition: all 0.2s ease;
 }
 
 .close-button:hover {
-  background: #f8f9fa;
-  color: #495057;
+  background: #B00020;
+  color: #ffffff;
 }
 
 .modal-content {
@@ -60,20 +63,22 @@
 .document-info {
   margin-bottom: 24px;
   padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
+  background: #ffffff;
+  border-radius: 0;
+  border-left: 4px solid #B00020;
+  border: 2px solid #000000;
+  border-left: 4px solid #B00020;
 }
 
 .document-info h3 {
   margin: 0 0 8px 0;
-  color: #2c3e50;
+  color: #000000;
   font-size: 1.1em;
 }
 
 .document-stats {
   margin: 0;
-  color: #6c757d;
+  color: #000000;
   font-size: 0.9em;
 }
 
@@ -90,18 +95,19 @@
   align-items: flex-start;
   cursor: pointer;
   font-weight: 500;
-  color: #495057;
+  color: #000000;
 }
 
 .checkbox-label input[type="checkbox"] {
   margin-right: 12px;
   transform: scale(1.2);
   margin-top: 2px;
+  accent-color: #B00020;
 }
 
 .option-description {
   margin: 8px 0 0 28px;
-  color: #6c757d;
+  color: #000000;
   font-size: 0.9em;
   line-height: 1.4;
 }
@@ -112,25 +118,27 @@
 }
 
 .generate-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #B00020;
+  color: #ffffff;
   border: none;
   padding: 14px 32px;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 1em;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(176, 0, 32, 0.3);
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 0 auto;
+  border: 2px solid #000000;
 }
 
 .generate-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(176, 0, 32, 0.4);
+  background: #000000;
 }
 
 .generate-button:disabled {
@@ -142,10 +150,28 @@
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.spinner::before {
+  content: '⬛⬛⬛';
+  font-size: 5px;
+  letter-spacing: 1px;
+  color: #ffffff;
+  animation: dotsFlash 1.4s infinite;
+}
+
+@keyframes dotsFlash {
+  0%, 80%, 100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 
 @keyframes spin {
@@ -154,10 +180,11 @@
 }
 
 .share-result {
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 0;
   padding: 20px;
   margin: 20px 0;
+  border: 2px solid #000000;
 }
 
 .link-section {
@@ -168,7 +195,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #495057;
+  color: #000000;
 }
 
 .link-input-group {
@@ -179,36 +206,38 @@
 .share-link-input {
   flex: 1;
   padding: 12px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
+  border: 2px solid #000000;
+  border-radius: 0;
   font-family: monospace;
   font-size: 0.9em;
-  background: white;
+  background: #ffffff;
+  color: #000000;
 }
 
 .copy-button {
-  background: #28a745;
-  color: white;
+  background: #B00020;
+  color: #ffffff;
   border: none;
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 1em;
   min-width: 48px;
+  border: 2px solid #000000;
 }
 
 .copy-button:hover {
-  background: #218838;
+  background: #000000;
 }
 
 .copy-button.success {
-  background: #20c997;
+  background: #B00020;
 }
 
 .copy-success {
   margin: 8px 0 0 0;
-  color: #28a745;
+  color: #B00020;
   font-size: 0.9em;
   font-weight: 500;
 }
@@ -218,19 +247,20 @@
 }
 
 .preview-button {
-  background: #17a2b8;
-  color: white;
+  background: #000000;
+  color: #ffffff;
   border: none;
   padding: 12px 24px;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
   width: 100%;
+  border: 2px solid #000000;
 }
 
 .preview-button:hover {
-  background: #138496;
+  background: #B00020;
 }
 
 .share-actions {
@@ -240,51 +270,54 @@
 }
 
 .share-action-button {
-  background: white;
-  border: 1px solid #ced4da;
+  background: #ffffff;
+  border: 2px solid #000000;
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
   text-align: center;
+  color: #000000;
 }
 
 .share-action-button:hover {
-  background: #f8f9fa;
-  border-color: #adb5bd;
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
 }
 
 .share-action-button.email:hover {
-  background: #e3f2fd;
-  border-color: #2196f3;
-  color: #1976d2;
+  background: #B00020;
+  border-color: #B00020;
+  color: #ffffff;
 }
 
 .share-action-button.social:hover {
-  background: #e8f5e8;
-  border-color: #1da1f2;
-  color: #1da1f2;
+  background: #B00020;
+  border-color: #B00020;
+  color: #ffffff;
 }
 
 .share-info {
   margin-top: 24px;
   padding: 16px;
-  background: #e7f3ff;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
+  background: #ffffff;
+  border-radius: 0;
+  border: 2px solid #000000;
+  border-left: 4px solid #B00020;
 }
 
 .share-info h4 {
   margin: 0 0 12px 0;
-  color: #0056b3;
+  color: #000000;
   font-size: 1em;
 }
 
 .share-info ul {
   margin: 0;
   padding-left: 20px;
-  color: #495057;
+  color: #000000;
 }
 
 .share-info li {

@@ -8,10 +8,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 25px;
-  color: white;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  color: #000000;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
@@ -19,17 +19,17 @@
 }
 
 .profile-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: #000000;
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
 .profile-avatar {
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  border-radius: 0;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid #000000;
 }
 
 .profile-name {
@@ -42,6 +42,7 @@
 .dropdown-arrow {
   transition: transform 0.3s ease;
   flex-shrink: 0;
+  color: #000000;
 }
 
 .dropdown-arrow.open {
@@ -52,10 +53,10 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  border-radius: 0;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+  border: 2px solid #000000;
   min-width: 280px;
   z-index: 1000;
   animation: dropdownSlide 0.2s ease-out;
@@ -82,9 +83,9 @@
 .dropdown-avatar {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 0;
   object-fit: cover;
-  border: 2px solid #f0f0f0;
+  border: 2px solid #000000;
 }
 
 .dropdown-user-info {
@@ -95,7 +96,7 @@
 .dropdown-name {
   font-weight: 600;
   font-size: 16px;
-  color: #333;
+  color: #000000;
   margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -104,7 +105,7 @@
 
 .dropdown-email {
   font-size: 14px;
-  color: #666;
+  color: #666666;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -112,7 +113,7 @@
 
 .dropdown-divider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.08);
+  background: #000000;
   margin: 0 16px;
 }
 
@@ -128,8 +129,8 @@
   padding: 12px 16px;
   background: none;
   border: none;
-  border-radius: 8px;
-  color: #666;
+  border-radius: 0;
+  color: #000000;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -137,21 +138,21 @@
 }
 
 .logout-button:hover {
-  background: #f5f5f5;
-  color: #333;
+  background: #000000;
+  color: #ffffff;
 }
 
 .logout-button.logging-out {
   cursor: not-allowed;
-  color: #999;
+  color: #666666;
 }
 
 .spinner-small {
   width: 16px;
   height: 16px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #667eea;
-  border-radius: 50%;
+  border: 2px solid #ffffff;
+  border-top: 2px solid #B00020;
+  border-radius: 0;
   animation: spin 1s linear infinite;
 }
 

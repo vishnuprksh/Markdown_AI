@@ -17,11 +17,29 @@
 .loading-container .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid rgba(102, 126, 234, 0.3);
-  border-top: 4px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 20px;
+  position: relative;
+}
+
+.loading-container .spinner::before {
+  content: '⬛⬛⬛';
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #B00020;
+  animation: dotsFlash 1.4s infinite;
+}
+
+@keyframes dotsFlash {
+  0%, 80%, 100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 
 @keyframes spin {
