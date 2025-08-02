@@ -5,7 +5,8 @@ const TopMenu = ({
   onNewDocument, 
   onSaveDocument, 
   onOpenCollections,
-  onShare, 
+  onShare,
+  onOpenSettings, 
   currentDocumentTitle,
   hasUnsavedChanges,
   onDocumentTitleChange,
@@ -133,6 +134,15 @@ const TopMenu = ({
           >
             <span className="button-icon">🔗</span>
             Share
+          </button>
+          
+          <button 
+            className="menu-button settings-button" 
+            onClick={onOpenSettings}
+            title="Open settings"
+          >
+            <span className="button-icon">⚙️</span>
+            Settings
           </button>
         </div>
       </div>

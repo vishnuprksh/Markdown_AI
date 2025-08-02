@@ -9,16 +9,21 @@ import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { storage } from '../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../contexts/AuthContext';
+import { useSettings } from '../contexts/SettingsContext';
 import { documentService } from '../services/documentService';
 import { firestoreTestService } from '../services/firestoreTestService';
 import TopMenu from './TopMenu';
 import CollectionsModal from './CollectionsModal';
 import AIModal from './AIModal';
 import ShareModal from './ShareModal';
+import SettingsModal from './SettingsModal';
 import { shareService } from '../services/shareService';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const MarkdownEditor = () => {
   const { user } = useAuth();
+  const { settings } = useSettings();
   
   // Document management state
   const [currentDocumentId, setCurrentDocumentId] = useState(null);
@@ -57,6 +62,12 @@ Start writing your **markdown** content here! This document will be automaticall
 
   // Share Modal state
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Settings Modal state
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+  // PDF download state
+  const [downloadStatus, setDownloadStatus] = useState('idle'); // idle, generating, success, error
 
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
@@ -313,6 +324,112 @@ Start writing your **markdown** content here!
 
   const handleCloseShareModal = () => {
     setIsShareModalOpen(false);
+  };
+
+  // Settings Modal handlers
+  const handleOpenSettings = () => {
+    setIsSettingsModalOpen(true);
+  };
+
+  const handleCloseSettings = () => {
+    setIsSettingsModalOpen(false);
+  };
+
+  // PDF download functionality
+  const handleDownloadPDF = async () => {
+    try {
+      setDownloadStatus('generating');
+      
+      // Get the preview content element
+      const previewContent = document.querySelector('.preview-content');
+      if (!previewContent) {
+        throw new Error('Preview content not found');
+      }
+
+      // Create canvas from the preview content
+      const canvas = await html2canvas(previewContent, {
+        scale: 2, // Higher resolution
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: previewContent.scrollWidth,
+        height: previewContent.scrollHeight,
+      });
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Calculate dimensions to fit the content on A4
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add the image to PDF
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add new pages if content is longer than one page
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Generate filename
+      const filename = documentTitle.replace('.md', '') + '.pdf';
+      
+      // Download the PDF
+      pdf.save(filename);
+      
+      setDownloadStatus('success');
+      
+      // Reset status after 2 seconds
+      setTimeout(() => {
+        setDownloadStatus('idle');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setDownloadStatus('error');
+      
+      // Reset status after 2 seconds
+      setTimeout(() => {
+        setDownloadStatus('idle');
+      }, 2000);
+    }
+  };
+
+  const getDownloadButtonContent = () => {
+    switch (downloadStatus) {
+      case 'generating':
+        return '⏳';
+      case 'success':
+        return '✅';
+      case 'error':
+        return '❌';
+      default:
+        return '�';
+    }
+  };
+
+  const getDownloadButtonTitle = () => {
+    switch (downloadStatus) {
+      case 'generating':
+        return 'Generating PDF...';
+      case 'success':
+        return 'PDF downloaded successfully!';
+      case 'error':
+        return 'Failed to generate PDF';
+      default:
+        return 'Download as PDF';
+    }
   };
 
   // Undo functionality
@@ -590,6 +707,7 @@ Start writing your **markdown** content here!
         onSaveDocument={handleSaveDocument}
         onOpenCollections={() => setIsCollectionsOpen(true)}
         onShare={handleOpenShareModal}
+        onOpenSettings={handleOpenSettings}
         currentDocumentTitle={documentTitle}
         hasUnsavedChanges={hasUnsavedChanges}
         onDocumentTitleChange={handleDocumentTitleChange}
@@ -671,6 +789,11 @@ Start writing your **markdown** content here!
         <textarea
           ref={textareaRef}
           className="editor-textarea"
+          style={{
+            fontSize: `${settings.fontSize}px`,
+            lineHeight: settings.lineHeight,
+            whiteSpace: settings.wordWrap ? 'pre-wrap' : 'pre',
+          }}
           value={markdown}
           onChange={(e) => {
             // Only save to history if it's a significant change (more than 10 characters difference)
@@ -697,12 +820,20 @@ Start writing your **markdown** content here!
       
       <div className="preview-panel">
         <div className="panel-header">
-          👁️ Live Preview
+          <span>👁️ Live Preview</span>
+          <button 
+            className="download-button"
+            onClick={handleDownloadPDF}
+            title={getDownloadButtonTitle()}
+            disabled={downloadStatus === 'generating'}
+          >
+            {getDownloadButtonContent()}
+          </button>
         </div>
         <div className="preview-content">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex, rehypeRaw]}
+            remarkPlugins={settings.renderLatex ? [remarkGfm, remarkMath] : [remarkGfm]}
+            rehypePlugins={settings.renderLatex ? [rehypeKatex, rehypeRaw] : [rehypeRaw]}
             components={{
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
@@ -744,6 +875,11 @@ Start writing your **markdown** content here!
         onShare={handleShare}
         documentTitle={documentTitle}
         markdown={markdown}
+      />
+      
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={handleCloseSettings}
       />
       
       <CollectionsModal

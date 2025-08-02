@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 import MarkdownEditor from './components/MarkdownEditor';
 import Login from './components/Login';
 import SharedDocument from './components/SharedDocument';
@@ -43,12 +44,14 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="App">
-          <Routes>
-            <Route path="/share/:shareId" element={<SharedDocument />} />
-            <Route path="/" element={<AppContent />} />
-          </Routes>
-        </div>
+        <SettingsProvider>
+          <div className="App">
+            <Routes>
+              <Route path="/share/:shareId" element={<SharedDocument />} />
+              <Route path="/" element={<AppContent />} />
+            </Routes>
+          </div>
+        </SettingsProvider>
       </AuthProvider>
     </Router>
   );
