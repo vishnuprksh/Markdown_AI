@@ -16,6 +16,7 @@ const TopMenu = ({
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(currentDocumentTitle);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleTitleClick = () => {
     setIsEditingTitle(true);
@@ -42,6 +43,48 @@ const TopMenu = ({
         return (
           <>
             <span className="button-icon">⏳</span>
+            <span className="button-text">Saving...</span>
+          </>
+        );
+      case 'saved':
+        return (
+          <>
+            <span className="button-icon">✅</span>
+            <span className="button-text">Saved!</span>
+          </>
+        );
+      case 'error':
+        return (
+          <>
+            <span className="button-icon">❌</span>
+            <span className="button-text">Error</span>
+          </>
+        );
+      default:
+        return (
+          <>
+            <span className="button-icon">💾</span>
+            <span className="button-text">Save</span>
+            {hasUnsavedChanges && <span className="unsaved-indicator">●</span>}
+          </>
+        );
+    }
+  };
+
+  const getSaveButtonDisabled = () => {
+    return saveStatus === 'saving' || (!hasUnsavedChanges && saveStatus === 'idle');
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const getMobileSaveButtonContent = () => {
+    switch (saveStatus) {
+      case 'saving':
+        return (
+          <>
+            <span className="button-icon">⏳</span>
             Saving...
           </>
         );
@@ -63,15 +106,16 @@ const TopMenu = ({
         return (
           <>
             <span className="button-icon">💾</span>
-            Save
+            Save Document
             {hasUnsavedChanges && <span className="unsaved-indicator">●</span>}
           </>
         );
     }
   };
 
-  const getSaveButtonDisabled = () => {
-    return saveStatus === 'saving' || (!hasUnsavedChanges && saveStatus === 'idle');
+  const handleMenuItemClick = (action) => {
+    action();
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -115,14 +159,26 @@ const TopMenu = ({
           <span className="logo-text">Markdown AI</span>
         </div>
         
-        <div className="menu-buttons">
+        {/* Hamburger menu button for mobile */}
+        <button 
+          className="hamburger-menu"
+          onClick={toggleMobileMenu}
+          title="Menu"
+        >
+          <span className={`hamburger-line ${isMobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`hamburger-line ${isMobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`hamburger-line ${isMobileMenuOpen ? 'open' : ''}`}></span>
+        </button>
+        
+        {/* Desktop menu buttons */}
+        <div className="menu-buttons desktop-menu">
           <button 
             className="menu-button" 
             onClick={onNewDocument}
             title="Create new document"
           >
             <span className="button-icon">📄</span>
-            New
+            <span className="button-text">New</span>
           </button>
           
           <button 
@@ -140,7 +196,7 @@ const TopMenu = ({
             title="View saved documents"
           >
             <span className="button-icon">📚</span>
-            Collections
+            <span className="button-text">Collections</span>
           </button>
           
           <button 
@@ -149,7 +205,7 @@ const TopMenu = ({
             title="Share document with others"
           >
             <span className="button-icon">🔗</span>
-            Share
+            <span className="button-text">Share</span>
           </button>
           
           <button 
@@ -158,7 +214,7 @@ const TopMenu = ({
             title={`${isScrollSyncEnabled ? 'Disable' : 'Enable'} scroll synchronization`}
           >
             <span className="button-icon">{isScrollSyncEnabled ? '🔒' : '🔓'}</span>
-            Sync
+            <span className="button-text">Sync</span>
           </button>
           
           <button 
@@ -167,7 +223,7 @@ const TopMenu = ({
             title="Open settings"
           >
             <span className="button-icon">⚙️</span>
-            Settings
+            <span className="button-text">Settings</span>
           </button>
         </div>
       </div>
@@ -197,6 +253,61 @@ const TopMenu = ({
       <div className="menu-right">
         <UserProfile />
       </div>
+
+      {/* Mobile dropdown menu */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="mobile-menu-item" 
+              onClick={() => handleMenuItemClick(onNewDocument)}
+            >
+              <span className="button-icon">📄</span>
+              New Document
+            </button>
+            
+            <button 
+              className="mobile-menu-item save-button" 
+              onClick={() => handleMenuItemClick(onSaveDocument)}
+              disabled={getSaveButtonDisabled()}
+            >
+              {getMobileSaveButtonContent()}
+            </button>
+            
+            <button 
+              className="mobile-menu-item" 
+              onClick={() => handleMenuItemClick(onOpenCollections)}
+            >
+              <span className="button-icon">📚</span>
+              Collections
+            </button>
+            
+            <button 
+              className="mobile-menu-item" 
+              onClick={() => handleMenuItemClick(onShare)}
+            >
+              <span className="button-icon">🔗</span>
+              Share
+            </button>
+            
+            <button 
+              className={`mobile-menu-item ${isScrollSyncEnabled ? 'active' : ''}`}
+              onClick={() => handleMenuItemClick(onToggleScrollSync)}
+            >
+              <span className="button-icon">{isScrollSyncEnabled ? '🔒' : '🔓'}</span>
+              {isScrollSyncEnabled ? 'Disable Sync' : 'Enable Sync'}
+            </button>
+            
+            <button 
+              className="mobile-menu-item" 
+              onClick={() => handleMenuItemClick(onOpenSettings)}
+            >
+              <span className="button-icon">⚙️</span>
+              Settings
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

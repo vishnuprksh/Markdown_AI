@@ -163,12 +163,88 @@
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+  .profile-button {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  
   .profile-name {
     display: none;
   }
   
+  .profile-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
   .profile-dropdown {
     right: -8px;
-    min-width: 260px;
+    min-width: 240px;
+    max-width: calc(100vw - 32px);
+  }
+  
+  .dropdown-header {
+    padding: 12px;
+  }
+  
+  .dropdown-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .dropdown-name {
+    font-size: 15px;
+  }
+  
+  .dropdown-email {
+    font-size: 13px;
+  }
+  
+  .logout-button {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-button {
+    padding: 4px 6px;
+  }
+  
+  .profile-avatar {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .dropdown-arrow {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .profile-dropdown {
+    right: -4px;
+    min-width: 220px;
+  }
+  
+  .dropdown-header {
+    padding: 10px;
+  }
+  
+  .dropdown-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .dropdown-name {
+    font-size: 14px;
+  }
+  
+  .dropdown-email {
+    font-size: 12px;
+  }
+  
+  .logout-button {
+    padding: 8px 10px;
+    font-size: 14px;
   }
 }
