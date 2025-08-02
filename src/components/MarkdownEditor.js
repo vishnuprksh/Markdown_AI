@@ -52,8 +52,6 @@ Start writing your **markdown** content here! This document will be automaticall
   const [selectedText, setSelectedText] = useState('');
   const [selectionStart, setSelectionStart] = useState(0);
   const [selectionEnd, setSelectionEnd] = useState(0);
-  const [showFloatingAI, setShowFloatingAI] = useState(false);
-  const [floatingAIPosition, setFloatingAIPosition] = useState({ x: 0, y: 0 });
 
   // Share Modal state
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -64,8 +62,13 @@ Start writing your **markdown** content here! This document will be automaticall
   // PDF download state
   const [downloadStatus, setDownloadStatus] = useState('idle'); // idle, generating, success, error
 
+  // Scroll synchronization state
+  const [isScrollSyncEnabled, setIsScrollSyncEnabled] = useState(true);
+  const [isScrolling, setIsScrolling] = useState(false);
+
   const fileInputRef = useRef(null);
   const textareaRef = useRef(null);
+  const previewRef = useRef(null);
 
   // Initialize with default content and track changes
   useEffect(() => {
@@ -83,32 +86,6 @@ Start writing your **markdown** content here! This document will be automaticall
       setSaveStatus('idle');
     }
   }, [markdown, originalContent, saveStatus]);
-
-  // Hide floating AI button when clicking outside
-  useEffect(() => {
-    const handleGlobalClick = (event) => {
-      if (!showFloatingAI) return;
-      
-      const isFloatingButton = event.target.closest('.floating-ai-button');
-      const isTextarea = event.target.closest('.editor-textarea');
-      
-      // If clicking outside both the floating button and textarea, hide it
-      if (!isFloatingButton && !isTextarea) {
-        setShowFloatingAI(false);
-        setSelectedText('');
-      }
-    };
-
-    // Add listener with slight delay to avoid conflicts
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('click', handleGlobalClick, true);
-    }, 0);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener('click', handleGlobalClick, true);
-    };
-  }, [showFloatingAI]);
 
   // Document management functions
   const handleNewDocument = async () => {
@@ -242,7 +219,6 @@ Start writing your **markdown** content here!`;
   const handleCloseAIModal = () => {
     setIsAIModalOpen(false);
     setSelectedText('');
-    setShowFloatingAI(false);
   };
 
   // Share functionality
@@ -412,7 +388,7 @@ Start writing your **markdown** content here!`;
       case 'error':
         return '❌';
       default:
-        return '�';
+        return '⬇️';
     }
   };
 
@@ -519,48 +495,9 @@ Start writing your **markdown** content here!`;
     const end = textarea.selectionEnd;
     const selected = markdown.substring(start, end);
     
-    if (selected.length > 0) {
-      // Calculate position at the end of selection
-      const textBeforeSelection = markdown.substring(0, end);
-      const lines = textBeforeSelection.split('\n');
-      const currentLine = lines.length - 1;
-      const currentColumn = lines[lines.length - 1].length;
-      
-      // Get textarea styling
-      const computedStyle = window.getComputedStyle(textarea);
-      const fontSize = parseInt(computedStyle.fontSize) || 16;
-      const lineHeight = parseInt(computedStyle.lineHeight) || fontSize * 1.2;
-      const paddingLeft = parseInt(computedStyle.paddingLeft) || 8;
-      const paddingTop = parseInt(computedStyle.paddingTop) || 8;
-      
-      // Calculate character width (approximate)
-      const charWidth = fontSize * 0.6; // Approximate character width
-      
-      // Get textarea position
-      const rect = textarea.getBoundingClientRect();
-      
-      // Calculate position at end of selection
-      const x = rect.left + paddingLeft + (currentColumn * charWidth);
-      const y = rect.top + paddingTop + (currentLine * lineHeight) - textarea.scrollTop + lineHeight;
-      
-      setSelectedText(selected);
-      setSelectionStart(start);
-      setSelectionEnd(end);
-      setFloatingAIPosition({
-        x: Math.min(x, window.innerWidth - 80), // Ensure it doesn't go off screen
-        y: Math.min(y, window.innerHeight - 50)
-      });
-      setShowFloatingAI(true);
-    } else {
-      // Hide floating AI button when no text is selected
-      setShowFloatingAI(false);
-      setSelectedText('');
-    }
-  };
-
-  const handleFloatingAIClick = () => {
-    setIsAIModalOpen(true);
-    setShowFloatingAI(false);
+    setSelectedText(selected);
+    setSelectionStart(start);
+    setSelectionEnd(end);
   };
 
   // Keyboard shortcuts
@@ -743,6 +680,47 @@ Start writing your **markdown** content here!`;
     insertText('## ');
   };
 
+  // Scroll synchronization functions
+  const syncEditorToPreview = useCallback(() => {
+    if (!isScrollSyncEnabled || isScrolling) return;
+    
+    const editor = textareaRef.current;
+    const preview = previewRef.current;
+    
+    if (!editor || !preview) return;
+    
+    setIsScrolling(true);
+    
+    const editorScrollRatio = editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
+    const previewScrollTop = editorScrollRatio * (preview.scrollHeight - preview.clientHeight);
+    
+    preview.scrollTop = previewScrollTop;
+    
+    setTimeout(() => setIsScrolling(false), 100);
+  }, [isScrollSyncEnabled, isScrolling]);
+
+  const syncPreviewToEditor = useCallback(() => {
+    if (!isScrollSyncEnabled || isScrolling) return;
+    
+    const editor = textareaRef.current;
+    const preview = previewRef.current;
+    
+    if (!editor || !preview) return;
+    
+    setIsScrolling(true);
+    
+    const previewScrollRatio = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
+    const editorScrollTop = previewScrollRatio * (editor.scrollHeight - editor.clientHeight);
+    
+    editor.scrollTop = editorScrollTop;
+    
+    setTimeout(() => setIsScrolling(false), 100);
+  }, [isScrollSyncEnabled, isScrolling]);
+
+  const toggleScrollSync = () => {
+    setIsScrollSyncEnabled(!isScrollSyncEnabled);
+  };
+
   const insertBold = () => {
     insertText('**', '**');
   };
@@ -781,6 +759,8 @@ Start writing your **markdown** content here!`;
         hasUnsavedChanges={hasUnsavedChanges}
         onDocumentTitleChange={handleDocumentTitleChange}
         saveStatus={saveStatus}
+        isScrollSyncEnabled={isScrollSyncEnabled}
+        onToggleScrollSync={toggleScrollSync}
       />
       
       <div className="markdown-editor">
@@ -792,7 +772,7 @@ Start writing your **markdown** content here!`;
               onClick={handleDownloadMarkdown}
               title="Download as Markdown file"
             >
-              📄
+              ⬇️
             </button>
           </div>
         <div className="toolbar">
@@ -882,6 +862,7 @@ Start writing your **markdown** content here!`;
           onMouseUp={handleTextSelection}
           onKeyUp={handleTextSelection}
           onPaste={handlePaste}
+          onScroll={syncEditorToPreview}
           placeholder="🚀 Start writing your markdown here... 
 
 ✨ Features:
@@ -908,7 +889,7 @@ Start writing your **markdown** content here!`;
             {getDownloadButtonContent()}
           </button>
         </div>
-        <div className="preview-content">
+        <div className="preview-content" ref={previewRef} onScroll={syncPreviewToEditor}>
           <ReactMarkdown
             remarkPlugins={settings.renderLatex ? [remarkGfm, remarkMath] : [remarkGfm]}
             rehypePlugins={settings.renderLatex ? [rehypeKatex, rehypeRaw] : [rehypeRaw]}
@@ -938,23 +919,6 @@ Start writing your **markdown** content here!`;
       </div>
       
       </div> {/* Close markdown-editor div */}
-      
-      {/* Floating AI Assistant Button */}
-      {showFloatingAI && (
-        <div 
-          className="floating-ai-button"
-          style={{
-            position: 'fixed',
-            left: `${floatingAIPosition.x}px`,
-            top: `${floatingAIPosition.y}px`,
-            zIndex: 999
-          }}
-          onClick={handleFloatingAIClick}
-          title="Enhance selected text with AI"
-        >
-          🤖 AI
-        </div>
-      )}
       
       <AIModal
         isOpen={isAIModalOpen}

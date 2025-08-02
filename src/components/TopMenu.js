@@ -10,7 +10,9 @@ const TopMenu = ({
   currentDocumentTitle,
   hasUnsavedChanges,
   onDocumentTitleChange,
-  saveStatus = 'idle'
+  saveStatus = 'idle',
+  isScrollSyncEnabled,
+  onToggleScrollSync
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(currentDocumentTitle);
@@ -148,6 +150,15 @@ const TopMenu = ({
           >
             <span className="button-icon">🔗</span>
             Share
+          </button>
+          
+          <button 
+            className={`menu-button ${isScrollSyncEnabled ? 'active' : ''}`}
+            onClick={onToggleScrollSync}
+            title={`${isScrollSyncEnabled ? 'Disable' : 'Enable'} scroll synchronization`}
+          >
+            <span className="button-icon">{isScrollSyncEnabled ? '🔒' : '🔓'}</span>
+            Sync
           </button>
           
           <button 

@@ -74,22 +74,12 @@ const AIModal = ({ isOpen, onClose, onApply, selectedText, fullContent }) => {
     <div className="ai-modal-overlay" onClick={onClose}>
       <div className="ai-modal" onClick={(e) => e.stopPropagation()}>
         <div className="ai-modal-header">
-          <h2>🤖 AI Assistant</h2>
+          <h2>🤖 AI Assistant {selectedText ? `(${selectedText.length} chars selected)` : `(${fullContent.length} chars)`}</h2>
           <button className="ai-modal-close" onClick={onClose}>×</button>
-        </div>
-        
-        <div className="ai-modal-info">
-          {selectedText ? (
-            <p>✅ <strong>Selected text:</strong> {selectedText.length} characters will be processed</p>
-          ) : (
-            <p>📄 <strong>Full document:</strong> {fullContent.length} characters will be processed</p>
-          )}
         </div>
 
         <div className="ai-modal-content">
           <div className="ai-tab-content">
-            <h3>🎯 Custom AI Processing</h3>
-            <p>Enter your instructions for how AI should process your content.</p>
             <textarea
               ref={textareaRef}
               className="custom-prompt-input"
@@ -103,7 +93,6 @@ Examples:
 • Convert to a how-to guide
 • Add more technical details
 • Summarize the main points"
-              rows={8}
             />
             <div className="ai-actions">
               {selectedText ? (
@@ -124,16 +113,7 @@ Examples:
                 </button>
               )}
             </div>
-            <div className="ai-shortcuts">
-              <small>💡 Press Ctrl+Enter to process • Esc to close</small>
-            </div>
           </div>
-        </div>
-
-        <div className="ai-modal-footer">
-          <p className="ai-disclaimer">
-            🔒 Powered by Google Gemini Flash 2.5 • Content is processed securely
-          </p>
         </div>
       </div>
     </div>
